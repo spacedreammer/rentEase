@@ -1,12 +1,47 @@
-# React + Vite
+# RentEase 🏠
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**RentEase** is a user-friendly web application built with **React** that simplifies the process of searching, listing, and managing rental properties. Whether you're a landlord or a tenant, RentEase provides an efficient platform to connect, communicate, and manage rentals with ease.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🔍 Browse available rental properties
+- 🏡 Landlord dashboard for listing and managing properties
+- 👥 User authentication (sign in / sign up)
+- 💬 Messaging system for tenant-landlord communication
+- 📱 Responsive design for all devices
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Frontend:** React, React Router, Tailwind CSS (if used)
+- **State Management:** Context API / Redux (if applicable)
+- **Backend/API:** (Add if any - Firebase, Supabase, Node.js, etc.)
+- **Authentication:** (e.g., Firebase Auth, Supabase Auth)
+- **Deployment:** (e.g., Vercel, Netlify, GitHub Pages)
+
+## 🧑‍💻 Getting Started
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- Node.js (v14 or later)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/your-username/rentEase.git
+cd rentEase
+```
+2. Install dependencies
+   npm install
+  # or
+  yarn install
+
+3.  Run the development server
+  npm start
+  # or
+  yarn start
+
