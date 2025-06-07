@@ -35,11 +35,11 @@ Make sure you have the following installed:
 git clone https://github.com/your-username/rentEase.git
 cd rentEase
 ```
-2. Install dependencies
+2. ##Install dependencies
    npm install
 
 
-3.  Run the development server
+3. ## Run the development server
   npm start
 
 
