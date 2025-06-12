@@ -9,7 +9,8 @@ import {
   FaSquareCaretLeft,
   FaSquareDribbble,
 } from "react-icons/fa6";
-const Card = ({ image, rentPrice, location, bedSize, bathRoom, houseSize }) => {
+import { Link } from "react-router-dom";
+const Card = ({ image, rentPrice, location, bedSize, bathRoom, houseSize, linka }) => {
   return (
     <>
       <div className="">
@@ -50,6 +51,12 @@ const Card = ({ image, rentPrice, location, bedSize, bathRoom, houseSize }) => {
                   {houseSize}m <sup>2</sup>
                 </p>
               </span>
+              <Link
+            to={linka}
+            className="h-[36px] bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-center text-sm"
+          >
+            Read More
+          </Link>
             </div>
             {/* <div className="flex flex-col lg:flex-row justify-between mb-4">
                   
