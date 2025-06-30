@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import DashboardLayout from '../layouts/DashboardLayout';
+import DashboardLayout from '../../layouts/DashboardLayout';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -20,7 +20,7 @@ const LandOwnerPage = () => {
         }
   
         try {
-          const res = await axios.post(`${url}/userProfile`, {}, {
+          const res = await axios.get(`${url}/userProfile`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -40,7 +40,7 @@ const LandOwnerPage = () => {
   return (
   <DashboardLayout role={'landlord'}>
       <div className="max-w-5xl mx-auto py-10 px-4">
-      <h1 className="text-2xl font-bold mb-4">LandLord Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-4">LandLord {userName} Dashboard</h1>
       <p className="text-gray-600 mb-4">View and manage House you own.</p>
 
       <div className="bg-white shadow rounded p-4">

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -56,6 +59,7 @@ class AuthController extends Controller
             'message' => 'Logged in successfully',
             'user' => $user,
             'access_token' => $token,
+            'role' => $user->role,
             'token_type' => 'bearer',
             'expires_in' => Auth::factory()->getTTL() * 60,
         ]);
@@ -142,6 +146,70 @@ class AuthController extends Controller
     }
     return response()->json($user);
 }
+
+
+public function updateProfile(Request $request)
+{
+
+    $user = Auth::user(); // <--- Get the authenticated user
+    if (!$user || !$user instanceof \App\Models\User) {
+        return response()->json(['message' => 'Unauthenticated or invalid user instance.'], 401);
+    }
+
+    // Validate the request data
+    $formFields = $request->validate([
+        'fname' => 'required|string|max:255',
+        'lname' => 'required|string|max:255',
+        'email' => [
+            'required',
+            'string',
+            'email',
+            'max:255',
+            Rule::unique('users')->ignore($user->id), // Ignore current user's email
+        ],
+        // 'password' => ['nullable', 'min:6'], // Users typically change password on a separate form
+        'phone'    => 'nullable|string|max:20',
+        // 'avatar'   => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // If user can update their own avatar
+        'bio'      => 'nullable|string|max:1000',
+    ]);
+
+    // Update fields directly
+    $user->fname = $formFields['fname'];
+    $user->lname = $formFields['lname'];
+    $user->email = $formFields['email'];
+
+    // Handle nullable fields explicitly (or rely on TrimStrings middleware)
+    $user->phone = !empty($formFields['phone']) ? $formFields['phone'] : null;
+    $user->bio   = !empty($formFields['bio']) ? $formFields['bio'] : null;
+
+    // If you want user to update their own password via this endpoint, include the logic here.
+    // if (isset($formFields['password']) && !empty($formFields['password'])) {
+    //     $user->password = Hash::make($formFields['password']);
+    // }
+
+    // If you want user to update their own avatar via this endpoint, include the logic here.
+    // if ($request->hasFile('avatar')) {
+    //     if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+    //         Storage::disk('public')->delete($user->avatar);
+    //     }
+    //     $avatarPath = $request->file('avatar')->store('avatars', 'public');
+    //     $user->avatar = $avatarPath;
+    // } elseif ($request->has('avatar') && ($request->input('avatar') === null || $request->input('avatar') === '')) {
+    //      if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+    //         Storage::disk('public')->delete($user->avatar);
+    //     }
+    //     $user->avatar = null;
+    // }
+
+    $user->save();
+
+    return response()->json([
+        'message' => 'Profile updated successfully!',
+        'user' => $user // Return the full updated user object
+    ], 200);
+}
+
+
 
     public function deleteUser($id)
     {

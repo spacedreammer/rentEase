@@ -4,15 +4,17 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const AdminDashboardLayout = () => {
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const logout = async () => {
     try {
       await axios.post(
         "http://127.0.0.1:8000/api/auth/logout",
-        {},
+
+        {}, // No body needed for logout
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -49,7 +51,6 @@ const AdminDashboardLayout = () => {
           <NavLink onClick={logout} className="hover:text-cyan-400">
             Logout
           </NavLink>
-        
         </nav>
       </aside>
 

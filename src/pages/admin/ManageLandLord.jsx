@@ -86,11 +86,7 @@ const ManageLandLord = () => {
                   <button
                     className="text-red-600 hover:underline"
                     onClick={() => {
-                        // Directly trigger delete from here if you prefer, or pass to UpdateUser
-                        // For simplicity, we'll let UpdateUser handle the delete button click
-                        // but you could also do it here if you like.
-                        // For now, setting selectedUserId will open the update form
-                        // where the delete button is available.
+                      
                         handleEditClick(landlord.id);
                     }}
                   >

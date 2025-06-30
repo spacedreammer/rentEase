@@ -1,42 +1,91 @@
-import React, { useState, useEffect } from "react"; // Import useState and useEffect
-import axios from "axios"; // Import axios
+import React, { useState, useEffect, useCallback } from "react"; // Add useCallback
+import axios from "axios";
 import Card from "../components/Card";
 import SearchFilter from "../components/SearchFilter";
-import { toast } from "react-toastify"; // For error notifications
+import { toast } from "react-toastify";
 
 const HomePage = () => {
   const baseUrl = "http://127.0.0.1:8000";
-  const [houses, setHouses] = useState([]); // State to store fetched houses
-  const [loading, setLoading] = useState(true); // State to manage loading status
-  const [error, setError] = useState(null); // State to store any errors
+  const [houses, setHouses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // This effect runs once after the initial render
-    const fetchHouses = async () => {
-      try {
-        setLoading(true); // Set loading to true before fetching
-        setError(null); // Clear any previous errors
+  // State for filter criteria
+  const [filters, setFilters] = useState({
+    location: "",
+    moveInDate: "",
+    minPrice: "", // Will hold the lower bound of the price range
+    maxPrice: "", // Will hold the upper bound of the price range
+    propertyType: "",
+  });
 
-        const response = await axios.get("http://127.0.0.1:8000/api/auth/list-houses"); // Your API endpoint
-        setHouses(response.data); // Update state with fetched houses
-        toast.success("Houses loaded successfully!", {
-          toastId: "houses-loaded"
-        }); // Optional success message
-      } catch (err) {
-        console.error("Error fetching houses:", err);
-        toast.error("Failed to load houses. " + (err.response?.data?.message || err.message), { toastId: "load-fail"}); // Display toast
-      } finally {
-        setLoading(false); // Set loading to false after fetch attempt
+  // Callback function to fetch houses, memoized with useCallback
+  // This function will be re-created only if filters change
+  const fetchHouses = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Construct query parameters from filters
+      const params = new URLSearchParams();
+      if (filters.location) {
+        params.append("location", filters.location);
       }
-    };
+      if (filters.moveInDate) {
+        params.append("move_in_date", filters.moveInDate); // Use snake_case for backend
+      }
+      if (filters.minPrice) {
+        params.append("min_price", filters.minPrice);
+      }
+      if (filters.maxPrice) {
+        params.append("max_price", filters.maxPrice);
+      }
+      if (filters.propertyType) {
+        params.append("property_type", filters.propertyType); // Use snake_case for backend
+      }
 
-    fetchHouses(); // Call the fetch function
-  }, []); // The empty dependency array ensures this effect runs only once on mount
+      const queryString = params.toString();
+      const apiUrl = `http://127.0.0.1:8000/api/auth/list-houses${queryString ? `?${queryString}` : ""}`;
+
+      console.log("Fetching houses with URL:", apiUrl); // Debugging
+
+      const response = await axios.get(apiUrl);
+      setHouses(response.data);
+      toast.success("Houses loaded successfully!", {
+        toastId: "houses-loaded",
+      });
+    } catch (err) {
+      console.error("Error fetching houses:", err);
+      // More specific error message if backend provides it
+      toast.error("Failed to load houses. " + (err.response?.data?.message || err.message), { toastId: "load-fail" });
+      setError("Failed to load houses. Please try again later."); // Set error state for conditional rendering
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]); // Dependency array: re-run fetchHouses when filters change
+
+  // Initial fetch when component mounts or filters change
+  useEffect(() => {
+    fetchHouses();
+  }, [fetchHouses]); // Dependency array includes fetchHouses
+
+  // Handler for when the search button is clicked in SearchFilter
+  const handleSearch = () => {
+    fetchHouses(); // Re-fetch houses with current filter state
+  };
+
+  // Handler to update filter state from SearchFilter inputs
+  const handleFilterChange = (name, value) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: value,
+    }));
+  };
 
   // Conditional rendering based on loading and error states
   if (loading) {
     return (
-      <div className="flex justify-center items-center mt-8">
+      <div className="flex justify-center items-center min-h-[50vh]"> {/* Added min-h for better centering */}
         <p className="text-xl">Loading houses...</p>
       </div>
     );
@@ -44,7 +93,7 @@ const HomePage = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center mt-8 text-red-600">
+      <div className="flex justify-center items-center min-h-[50vh] text-red-600">
         <p className="text-xl">{error}</p>
       </div>
     );
@@ -55,31 +104,34 @@ const HomePage = () => {
       <h1 className="flex justify-center items-center mt-4 font-poppins text-3xl font-bold">
         Search properties to rent
       </h1>
-      <SearchFilter />
+      {/* Pass filter state and handlers to SearchFilter */}
+      <SearchFilter
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onSearch={handleSearch}
+      />
 
       {/* Flex container for cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
         {houses.length > 0 ? (
           houses.map((house) => (
-            <div key={house.id} className="w-full"> {/* Use w-full for grid items */}
+            <div key={house.id} className="w-full">
               <Card
-                image={house.images && house.images.length > 0 ? `${baseUrl}${house.images[0]}` : `${baseUrl}/placeholder.jpg`} // Display first image or a placeholder
+                image={house.images && house.images.length > 0 ? `${baseUrl}${house.images[0]}` : `${baseUrl}/placeholder.jpg`}
                 location={house.location}
-                rentPrice={`${house.price} TZS`} // Format price (e.g., add currency)
+                rentPrice={`${house.price} TZS`}
                 bathRoom={`${house.bathrooms} Bath Rooms`}
                 bedSize={`${house.bedrooms} Beds`}
-                houseSize={`${house.size} sq.ft`} // Assuming size is in sq.ft
-                // You might also want to pass description, title etc. to the Card if it uses them
+                houseSize={`${house.size} sq.ft`}
                 title={house.title}
                 description={house.description}
-                linka={`/house/${house.id}`} // CORRECT
- // Link to house details page
+                linka={`/house/${house.id}`}
               />
             </div>
           ))
         ) : (
           <div className="col-span-full text-center text-gray-600 text-lg mt-8">
-            No houses found.
+            No houses found. Try adjusting your search criteria.
           </div>
         )}
       </div>

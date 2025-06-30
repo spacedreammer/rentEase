@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
-const LandlordHouses = () => {
+const AddPropertyForm = () => {
   const [form, setForm] = useState({
     title: "",
     location: "",
@@ -185,4 +185,4 @@ const LandlordHouses = () => {
   );
 };
 
-export default LandlordHouses;
+export default AddPropertyForm;

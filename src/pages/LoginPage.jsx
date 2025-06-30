@@ -1,12 +1,16 @@
+// src/pages/LoginPage.jsx
+
 import React, { useState } from "react";
 import ImageSlider from "../components/ImageSlider";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
+
 const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
+
   const Submit = async (e) => {
     e.preventDefault();
     try {
@@ -16,16 +20,24 @@ const LoginPage = () => {
       });
 
       console.log("Logged in:", res.data);
-      localStorage.setItem("token", res.data.access_token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // --- FIX IS HERE: Destructure 'user' and 'access_token' FIRST ---
       const { access_token, user } = res.data;
+
+      localStorage.setItem("token", access_token); // Use the destructured access_token
+      localStorage.setItem("user_id", user.id); // Now 'user' is defined and has 'id'
+      localStorage.setItem("user", JSON.stringify(user)); // Use the destructured user
+      localStorage.setItem("role", user.role); // Use the destructured user.role
 
       if (user.role === "tenant") {
         toast.success(`Welcome back ${user.fname}`);
-        navigate(`/tenant/${user.id}`);
+
+        navigate(`/tenant`); // Navigating to /tenant is usually sufficient for the main dashboard
       } else if (user.role === "landlord") {
+        toast.success(`Welcome back ${user.fname}`); // Add toast for landlord too
         navigate(`/landlord`);
       } else if (user.role === "admin") {
+        toast.success(`Welcome back ${user.fname}`); // Add toast for admin too
         navigate(`/admin`);
       } else if (user.role === "agent") {
         toast.success(`Welcome back ${user.fname}`);
@@ -38,8 +50,13 @@ const LoginPage = () => {
         "The Login failed failed",
         err.response?.data || err.message
       );
+      toast.error(
+        err.response?.data?.message ||
+          "Login failed. Please check your credentials."
+      );
     }
   };
+
   return (
     <>
       <div className="bg-[#f7f7ff] font-poppins shadow-md rounded-md mt-28 p-10">

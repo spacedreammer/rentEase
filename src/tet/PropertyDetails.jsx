@@ -138,7 +138,7 @@ const PropertyDetails = () => {
       {/* Right Section (1/3) */}
       <div className="space-y-6">
         <RequestTour houseId={house.id} />{" "}
-        {/* Pass houseId if needed for tour requests */}
+       
         {/* Pass landlord info to LandlordInfo component */}
         <LandlordInfo landlord={house.user} />
         {/* Assuming house.user contains landlord data */}

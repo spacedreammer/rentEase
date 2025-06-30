@@ -37,6 +37,9 @@ class User extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'email_verified_at', 
+        'created_at',        
+        'updated_at',        
     ];
 
     /**
@@ -70,6 +73,27 @@ class User extends Authenticatable implements JWTSubject
 
     public function houses()
     {
-        return $this->hasMany(House::class);
+        return $this->hasMany(House::class, 'user_id'); 
     }
+
+
+     // --- NEW MESSAGE RELATIONSHIPS ---
+
+    /**
+     * Get the messages sent by the user.
+     */
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    /**
+     * Get the messages received by the user.
+     */
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+   
 }
